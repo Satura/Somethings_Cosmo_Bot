@@ -15,3 +15,12 @@
 - pandas
 
 Для работы в файле `constant.py` прописываются токены _telegram_token_ и _yandex_weather_token_
+
+### Скриншоты
+
+<details>
+  <summary>Запуск, меню команд</summary>
+  
+  [](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/01_start.png)
+   
+</details>
