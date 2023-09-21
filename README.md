@@ -21,6 +21,6 @@
 <details>
   <summary>Запуск, меню команд</summary>
   
-  [](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/01_start.png)
+  https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/01_start.png
    
 </details>
