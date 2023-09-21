@@ -83,9 +83,10 @@ def navigate(message):
     if message.text == 'Космо':
         # Сводка по космонавтике, дальнейшая навигация
         brief = (f'{func.launch()}\n'
-                 f'--- Погода на космодромах ---\n'
-                 f'Байконур: \n{func.weather("Байконур")}\n'
-                 f'Восточный: \n{func.weather("Восточный")}')
+                 f'\n--- Погода на космодромах ---\n'
+                 f'\nБайконур: \n{func.weather("Байконур")}\n'
+                 f'\nВосточный: \n{func.weather("Восточный")}\n'
+                 f'\nПлесецк: \n{func.weather("Плесецк")}')
         markup.add(cosmo_btn1, cosmo_btn2)
         markup.add(cosmo_btn3)
         bot.send_message(message.chat.id, brief, parse_mode='HTML', reply_markup=markup)
