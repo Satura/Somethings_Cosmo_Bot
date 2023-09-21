@@ -12,7 +12,6 @@
 - CurrencyConverter
 - requests
 - BeautifulSoup
-- json
 - pandas
 
 Для работы в файле `constant.py` прописываются токены _telegram_token_ и _yandex_weather_token_
