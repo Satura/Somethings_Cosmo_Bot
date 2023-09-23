@@ -1,3 +1,5 @@
+from datetime import time
+
 import telebot
 import func
 from telebot import types
@@ -86,7 +88,7 @@ def navigate(message):
                  f'\n--- Погода на космодромах ---\n'
                  f'\nБайконур: \n{func.weather("Байконур")}\n'
                  f'\nВосточный: \n{func.weather("Восточный")}\n'
-                 f'\nПлесецк: \n{func.weather("Плесецк")}')
+                 )
         markup.add(cosmo_btn1, cosmo_btn2)
         markup.add(cosmo_btn3)
         bot.send_message(message.chat.id, brief, parse_mode='HTML', reply_markup=markup)
@@ -146,4 +148,10 @@ def take_currency(message):
         bot.register_next_step_handler(message, take_currency)
 
 
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception as e:
+            time.sleep(3)
+            print(e)
