@@ -1,11 +1,12 @@
-# Somethings&SpaceBot
+# Somethings&CosmoBot
 Бот для отображения различной информации о финансах и космонавтике.
 
 ### Бот умеет:
 - отображать сведения с сайтов ЦБ РФ, ГК «Роскосмос», портала «Новости космонавтики», в том числе новости по ключевому слову
-- выводить случайный совет из подборки в CVS фале
+- выводить случайный совет из подборки в приложенном CVS-фале
 - конвертировать валюты
 - выводить сведения о погоде на космодромах с Яндекс.Погоды
+- показывать погоду с Яндекс.Погода по запросу пользователя (получает координаты с Яндекс.Карт)
 
 ### Использует дополнительные библиотеки: 
 - telebot
@@ -13,8 +14,10 @@
 - requests
 - BeautifulSoup
 - pandas
+- json
+- yandex_geocoder
 
-Для работы в файле `constant.py` прописываются токены _telegram_token_ и _yandex_weather_token_
+Для работы в файле `constant.py` прописываются токены: _telegram_token_, _yandex_weather_token_ и _yandex_maps_token_
 
 ### Скриншоты
 
@@ -62,6 +65,13 @@
 
 <details>
   <summary>Все последние новости с сайта</summary>
+  
+  ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/07_%D0%B2%D1%81%D0%B5%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.png)
+   
+</details>
+
+<details>
+  <summary>Прогноз погоды</summary>
   
   ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/07_%D0%B2%D1%81%D0%B5%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.png)
    

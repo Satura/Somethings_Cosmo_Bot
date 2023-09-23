@@ -1,4 +1,4 @@
-from datetime import time
+import time
 
 import telebot
 import func
@@ -6,11 +6,15 @@ from telebot import types
 from constant import telegram_token
 import webbrowser
 from currency_converter import CurrencyConverter
+import json
 
 bot = telebot.TeleBot(telegram_token)
 amount = 0
 c = CurrencyConverter()
 all_news = ''
+locations = []
+lat = 0
+lon = 0
 
 
 @bot.message_handler(commands=['start'])
@@ -65,13 +69,18 @@ def space_news_keyword(message):
     bot.send_message(message.chat.id, 'О чем желаете найти новости?')
     bot.register_next_step_handler(message, search_in_news)
 
+@bot.message_handler(commands=['get_weather'])
+def weather(message):
+    bot.send_message(message.chat.id, 'Введите название населенного пункта')
+    bot.register_next_step_handler(message, get_weather)
 
 @bot.message_handler()
 def navigate(message):
     ''' Сводка и навгация по "разделам" деньги/космос '''
     markup = types.InlineKeyboardMarkup()
-    fin_btn1 = types.InlineKeyboardButton('Конвертер валют', callback_data='converter')
-    fin_btn2 = types.InlineKeyboardButton('Полезность', callback_data='site_fin_cult')
+    some_btn1 = types.InlineKeyboardButton('Конвертер валют', callback_data='converter')
+    some_btn2 = types.InlineKeyboardButton('Полезность', callback_data='site_fin_cult')
+    some_btn3 = types.InlineKeyboardButton('Прогноз погоды', callback_data='weather')
     cosmo_btn1 = types.InlineKeyboardButton('Сейчас на орбите', callback_data='orbit')
     cosmo_btn2 = types.InlineKeyboardButton('Новости космонавтики', callback_data='space_news')
     cosmo_btn3 = types.InlineKeyboardButton('Новости по ключевому слову', callback_data='space_news_keyword')
@@ -79,7 +88,8 @@ def navigate(message):
     if message.text == 'Всяко-разно':
         # Сводка от ЦБ, дальнейшая навигация 
         brief = func.fin_info()
-        markup.add(fin_btn1, fin_btn2)
+        markup.add(some_btn1, some_btn2)
+        markup.add(some_btn3)
         bot.send_message(message.chat.id, brief, parse_mode='HTML', reply_markup=markup)
 
     if message.text == 'Космо':
@@ -102,6 +112,9 @@ def callback_message(callback):
 
     if callback.data == 'converter':
         converter(callback.message)
+
+    if callback.data == 'weather':
+        weather(callback.message)
 
     if callback.data == 'orbit':
         bot.send_message(callback.message.chat.id, func.in_orbit())
@@ -148,10 +161,39 @@ def take_currency(message):
         bot.register_next_step_handler(message, take_currency)
 
 
+def get_weather(message):
+    ''' Получаем координаты и погоду '''
+
+    name = message.text
+    global locations, lon, lat
+    locations = func.search_loc(name)
+
+    if len(locations) == 1:
+        lon, lat = locations[0]['GeoObject']['Point']['pos'].split()
+        print(f'{name}, {lon}, {lat}')
+        bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
+#
+    if len(locations) > 1:
+        all_locs = ''
+        for l in range(len(locations)):
+             all_locs += f"{l} - {locations[l]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted']}\n"
+
+        bot.send_message(message.chat.id, f'Найдено несколько населенных пунктов с таким названием. '
+                                              f'Выберите номер локации: \n{all_locs}')
+        bot.register_next_step_handler(message,choose_location)
+
+
+def choose_location(message):
+    global locations, lon, lat
+    num = int(message.text)
+    lon, lat = locations[num]['GeoObject']['Point']['pos'].split()
+    bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
+
+
 if __name__ == '__main__':
     while True:
         try:
             bot.polling(none_stop=True)
         except Exception as e:
             time.sleep(3)
-            print(e)
+            print(f'There is an error: {e}')

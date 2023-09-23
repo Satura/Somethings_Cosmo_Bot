@@ -1,9 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 from constant import yandex_weather_token
+from constant import yandex_maps_token
 import json
 import pandas as pd
 import random
+import yandex_geocoder
+
 
 headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -150,13 +153,62 @@ def weather(name):
 
     yandex_json = json.loads(yandex_req.text)
     yandex_json['fact']['condition'] = conditions[yandex_json['fact']['condition']]
-    return f"""Температура: {yandex_json['fact']['temp']} , условия: {yandex_json['fact']['condition']}
-давление: {yandex_json['fact']['pressure_mm']} влажность: {yandex_json['fact']['humidity']}"""
+    return f"Температура: {yandex_json['fact']['temp']}, условия: {yandex_json['fact']['condition']}, \nдавление: {yandex_json['fact']['pressure_mm']}, влажность: {yandex_json['fact']['humidity']}"
 
 def fin_advice():
     ''' Выводит рандомный совет по фининсам из файла fin_advice.cvs '''
     df = pd.read_csv('fin_advice.cvs', sep=';')
-    r = random.randint(0,len(df))
+    r = random.randint(0,len(df)-1)
     adv = str(df['advice'][r])
     descr = str(df['descr'][r])
     return f'{adv}\n{descr}'
+
+
+def search_loc(loc_name):
+    client = yandex_geocoder.Client(yandex_maps_token)
+    # https://geocode-maps.yandex.ru/1.x?apikey=f85c9bb5-92f9-448a-a438-c141ca1b2d6f&geocode=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&=ru_Ru&format=json
+    # coordinates = client.coordinates(loc_name)
+
+    query = f'https://geocode-maps.yandex.ru/1.x?apikey={yandex_maps_token}&geocode={loc_name}&lang=ru_Ru&format=json'
+    yandex_resp = requests.get(query)
+    yandex_json = json.loads(yandex_resp.text)
+    # ветка ['GeoObjectCollection']['featureMember']['Point']['pos']
+    list_geoobjects = yandex_json['response']['GeoObjectCollection']['featureMember']
+    locations = []
+    for i in list_geoobjects:
+        if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality' or i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'province':
+            locations.append(i)
+    return locations
+    # point = json
+    # if len(locations) == 1:
+    #     return locations[0]['GeoObject']['Point']['pos']
+    #     # point = locations[0]
+    # if len(locations) > 1:
+    #     # print(locations)
+    #     for l in range(len(locations)):
+    #         print(f"{l} - {locations[l]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted']}")
+    #     num = int(input('Выберите номер локации '))
+    #     return locations[num]['GeoObject']['Point']['pos']
+
+
+def get_weather_coord(lon, lat):
+    url_yaweather = f'https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}&lang=u_RU&extra=true'
+    yandex_req = requests.get(url_yaweather, headers={'X-Yandex-API-Key': yandex_weather_token})
+    yandex_json = json.loads(yandex_req.text)
+    forcasts = yandex_json['forecasts']
+
+    output = ''
+    for day in forcasts:
+        date = day['date']
+        part_day = day['parts']['day']
+        day_temp = part_day['temp_avg']
+        day_wind = part_day['wind_speed']
+        day_cond = part_day['condition']
+        part_night = day['parts']['night']
+        night_temp = part_night['temp_avg']
+        night_wind = part_night['wind_speed']
+        night_cond = part_night['condition']
+        output += f'\nНа {date} (день/ночь): температура {day_temp}/{night_temp} скорость ветра {day_wind}/{night_wind} условия {day_cond}/{night_cond}\n'
+    return output
+
+# print(get_weather_coord(30.31449318, 59.93867493))
