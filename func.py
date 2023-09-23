@@ -5,6 +5,7 @@ from constant import yandex_maps_token
 import json
 import pandas as pd
 import random
+import yandex_geocoder
 
 headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',

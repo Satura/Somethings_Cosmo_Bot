@@ -69,10 +69,12 @@ def space_news_keyword(message):
     bot.send_message(message.chat.id, 'О чем желаете найти новости?')
     bot.register_next_step_handler(message, search_in_news)
 
+
 @bot.message_handler(commands=['get_weather'])
 def weather(message):
     bot.send_message(message.chat.id, 'Введите название населенного пункта')
     bot.register_next_step_handler(message, get_weather)
+
 
 @bot.message_handler()
 def navigate(message):
@@ -134,7 +136,7 @@ def search_in_news(message):
 
 
 def go_convert(message):
-    ''' Получает от пользователя сумму, которую требуется конвертировать ''' 
+    ''' Получает от пользователя сумму, которую требуется конвертировать '''
     global amount
     try:
         amount = int(message.text.strip())
@@ -171,15 +173,15 @@ def get_weather(message):
     if len(locations) == 1:
         lon, lat = locations[0]['GeoObject']['Point']['pos'].split()
         bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
-#
+    #
     if len(locations) > 1:
         all_locs = ''
         for l in range(len(locations)):
-             all_locs += f"{l} - {locations[l]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted']}\n"
+            all_locs += f"{l} - {locations[l]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted']}\n"
 
         bot.send_message(message.chat.id, f'Найдено несколько населенных пунктов с таким названием. '
-                                              f'Выберите номер локации: \n{all_locs}')
-        bot.register_next_step_handler(message,choose_location)
+                                          f'Выберите номер локации: \n{all_locs}')
+        bot.register_next_step_handler(message, choose_location)
 
 
 def choose_location(message):
