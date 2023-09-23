@@ -1,5 +1,5 @@
 # Somethings&CosmoBot
-Бот для отображения различной информации о финансах и космонавтике.
+Бот для отображения различной информации о финансах и космонавтике, конвертации валют и прогноза погоды.
 
 ### Бот умеет:
 - отображать сведения с сайтов ЦБ РФ, ГК «Роскосмос», портала «Новости космонавтики», в том числе новости по ключевому слову
@@ -72,6 +72,6 @@
 <details>
   <summary>Прогноз погоды</summary>
   
-  ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/07_%D0%B2%D1%81%D0%B5%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.png)
+  ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/08_%D0%BF%D1%80%D0%BE%D0%B3%D0%BD%D0%BE%D0%B7%20%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D1%8B.png)
    
 </details>
