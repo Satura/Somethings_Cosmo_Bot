@@ -170,7 +170,6 @@ def get_weather(message):
 
     if len(locations) == 1:
         lon, lat = locations[0]['GeoObject']['Point']['pos'].split()
-        print(f'{name}, {lon}, {lat}')
         bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
 #
     if len(locations) > 1:
