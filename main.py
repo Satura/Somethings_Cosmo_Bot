@@ -27,7 +27,7 @@ def main(message):
     bot.send_message(message.chat.id, 'Приветствую.\n'
                                       'Бот умеет выводить цифры от ЦБ РФ, '
                                       'покажет какой-нибудь совет по финансам и подскажет ресурсы с разными пооезностями, '
-                                      'может помочь с конвертацией валют, '
+                                      'может помочь с конвертацией валют и показать прогноз погоды, '
                                       'а так же что-то отобразит на тему космонавтики', reply_markup=reply_markup)
 
 
@@ -162,7 +162,7 @@ def take_currency(message):
 
 
 def get_weather(message):
-    ''' Получаем координаты и погоду '''
+    ''' Получает координаты и погоду (если найден только один пункт с таким названием) '''
 
     name = message.text
     global locations, lon, lat
@@ -184,6 +184,7 @@ def get_weather(message):
 
 
 def choose_location(message):
+    ''' Принимает номер выбранной локации и выводит погоду '''
     global locations, lon, lat
     num = int(message.text)
     lon, lat = locations[num]['GeoObject']['Point']['pos'].split()

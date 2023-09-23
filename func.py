@@ -5,8 +5,6 @@ from constant import yandex_maps_token
 import json
 import pandas as pd
 import random
-import yandex_geocoder
-
 
 headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -41,15 +39,16 @@ def fin_info():
 {exchange_rates_m3[0].get_text(strip=True)}: {exchange_rates_m3[1].get_text(strip=True)}
 """
 
+
 def space_news():
     ''' Выводит сводку новостей с первой страницы сайта Новости космонавтики, раздел Новости '''
-    
+
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
     req_space_news = requests.get(url_space_news, headers).text
     soup = BeautifulSoup(req_space_news, 'html.parser')
     news_cards = soup.findAll('article')
     news = []
-    
+
     for card in news_cards:
         card_date = card.find('span', class_="entry-date").get_text()
         card_title = card.find('h2', class_="post-title").get_text()
@@ -65,7 +64,7 @@ def space_news2(key_word):
 
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
     news = ''
-    
+
     for page in range(1, 6):
         url = url_space_news + f'page/{page}'
         # print(url) # check
@@ -80,19 +79,21 @@ def space_news2(key_word):
                 art_link = art.find('a', class_="read-more").get("href")
                 # print(f'{art_date} / {art_title} \n{art_link}') # check
                 news += f'{art_date} / {art_title} \n{art_link}\n'
-    
+
     return news
+
 
 def space_news_all():
     ''' Получает все новости с сайта Новости космонавтики '''
-    
+
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
     req_space_news = requests.get(url_space_news, headers).text
     soup = BeautifulSoup(req_space_news, 'html.parser')
     page_numbers = soup.findAll('a', class_='page-numbers')
     last_page = page_numbers[-2].get_text()
-    news = ''
-    for page in range(1, last_page+1):
+    # news = ''
+    news = []
+    for page in range(1, last_page + 1):
         url = url_space_news + f'page/{page}'
         # print(url) # check
         req = requests.get(url).text
@@ -102,8 +103,10 @@ def space_news_all():
             art_title = art.find('h2', class_="post-title").get_text()
             art_date = art.find('span', class_="entry-date").get_text()
             art_link = art.find('a', class_="read-more").get("href")
-            news += f'{art_date} / {art_title} \n{art_link}\n'
+            # news += f'{art_date} / {art_title} \n{art_link}\n'
+            news.append(f'{art_date} / {art_title} \n{art_link}\n')
     return news
+
 
 def in_orbit():
     """ Выводит количество человек на орбите на сегодняшний день и их имена """
@@ -155,40 +158,27 @@ def weather(name):
     yandex_json['fact']['condition'] = conditions[yandex_json['fact']['condition']]
     return f"Температура: {yandex_json['fact']['temp']}, условия: {yandex_json['fact']['condition']}, \nдавление: {yandex_json['fact']['pressure_mm']}, влажность: {yandex_json['fact']['humidity']}"
 
+
 def fin_advice():
     ''' Выводит рандомный совет по фининсам из файла fin_advice.cvs '''
     df = pd.read_csv('fin_advice.cvs', sep=';')
-    r = random.randint(0,len(df)-1)
+    r = random.randint(0, len(df) - 1)
     adv = str(df['advice'][r])
     descr = str(df['descr'][r])
     return f'{adv}\n{descr}'
 
 
 def search_loc(loc_name):
-    client = yandex_geocoder.Client(yandex_maps_token)
-    # https://geocode-maps.yandex.ru/1.x?apikey=f85c9bb5-92f9-448a-a438-c141ca1b2d6f&geocode=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&=ru_Ru&format=json
-    # coordinates = client.coordinates(loc_name)
-
     query = f'https://geocode-maps.yandex.ru/1.x?apikey={yandex_maps_token}&geocode={loc_name}&lang=ru_Ru&format=json'
     yandex_resp = requests.get(query)
     yandex_json = json.loads(yandex_resp.text)
-    # ветка ['GeoObjectCollection']['featureMember']['Point']['pos']
     list_geoobjects = yandex_json['response']['GeoObjectCollection']['featureMember']
     locations = []
     for i in list_geoobjects:
-        if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality' or i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'province':
+        if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality' or \
+                i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'province':
             locations.append(i)
     return locations
-    # point = json
-    # if len(locations) == 1:
-    #     return locations[0]['GeoObject']['Point']['pos']
-    #     # point = locations[0]
-    # if len(locations) > 1:
-    #     # print(locations)
-    #     for l in range(len(locations)):
-    #         print(f"{l} - {locations[l]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted']}")
-    #     num = int(input('Выберите номер локации '))
-    #     return locations[num]['GeoObject']['Point']['pos']
 
 
 def get_weather_coord(lon, lat):
@@ -210,5 +200,3 @@ def get_weather_coord(lon, lat):
         night_cond = part_night['condition']
         output += f'\nНа {date} (день/ночь): температура {day_temp}/{night_temp} скорость ветра {day_wind}/{night_wind} условия {day_cond}/{night_cond}\n'
     return output
-
-# print(get_weather_coord(30.31449318, 59.93867493))
