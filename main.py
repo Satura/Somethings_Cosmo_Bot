@@ -11,10 +11,7 @@ import json
 bot = telebot.TeleBot(telegram_token)
 amount = 0
 c = CurrencyConverter()
-# all_news = ''
 locations = []
-# lat = 0
-# lon = 0
 news_index = 0
 keyword_news_index = 0
 all_kw_news = []
@@ -83,14 +80,17 @@ def space_news(message):
 
     all_news = func.space_news_all()
     for i in range(news_index, news_index + 6):
-        output += all_news[i]
+        try:
+            output += all_news[i]
+        except IndexError:
+            output += 'Дальше не совсем уже не новости'
+            break
     bot.send_message(message.chat.id, output, reply_markup=markup, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['space_news_keyword'])
 def space_news_keyword(message):
     """ Задание ключевого слова для поиска новостей """
-    global keyword_news_index
     bot.send_message(message.chat.id, 'О чем желаете найти новости?')
     bot.register_next_step_handler(message, search_in_news)
 
@@ -164,7 +164,7 @@ def callback_message(callback):
 
     if callback.data == 'more_kw_news':
         keyword_news_index += 3
-        search_in_news(callback.message)
+        print_3_kw_news(callback.message)
 
     if callback.data == 'exit_kw_news':
         keyword_news_index = 0
@@ -173,26 +173,30 @@ def callback_message(callback):
 
 def search_in_news(message):
     """ Ищет и отображает новости по заданному слову """
-    keyword = message.text.strip()
-    # output = func.space_news2(keyword)
-    # bot.send_message(message.chat.id, output)
     global all_kw_news
+    keyword = message.text.strip()
     all_kw_news = func.space_news2(keyword)
-    bot.register_next_step_handler(message, print_3_kw_news)
+    if len(all_kw_news) == 0:
+        bot.send_message(message.chat.id, 'Нет новостей об этом')
+    else:
+        bot.register_next_step_handler(message, print_3_kw_news)
 
 
 def print_3_kw_news(message):
     global all_kw_news, keyword_news_index
     output = ''
     markup = types.InlineKeyboardMarkup()
-    more_btn = types.InlineKeyboardButton('More', callback_data='more_kw_news')
-    exit_btn = types.InlineKeyboardButton('Stop', callback_data='exit_kw_news')
+    more_btn = types.InlineKeyboardButton('Больше', callback_data='more_kw_news')
+    exit_btn = types.InlineKeyboardButton('Хватит', callback_data='exit_kw_news')
     markup.add(more_btn, exit_btn)
 
     for i in range(keyword_news_index, keyword_news_index + 3):
-        print(f'i = {i}, keyword id = {keyword_news_index + i}, len all_kw_news = {len(all_kw_news)}')
-        output += all_kw_news[i]
-    # print(len(all_kw_news), keyword_news_index, keyword_news_index + 3)
+        try:
+            output += all_kw_news[i]
+        except IndexError:
+            output += 'Дальше новости совсем не свежие и не загружались\n'
+            break
+
     bot.send_message(message.chat.id, output, reply_markup=markup, parse_mode='Markdown')
 
 

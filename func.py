@@ -5,7 +5,6 @@ from constant import yandex_maps_token
 import json
 import pandas as pd
 import random
-import yandex_geocoder
 
 headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -42,7 +41,7 @@ def fin_info():
 
 
 def space_news():
-    ''' Выводит сводку новостей с первой страницы сайта Новости космонавтики, раздел Новости '''
+    """ Выводит сводку новостей с первой страницы сайта Новости космонавтики, раздел Новости """
 
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
     req_space_news = requests.get(url_space_news, headers).text
@@ -85,7 +84,8 @@ def space_news2(key_word):
 
 
 def space_news_all():
-    ''' Получает все новости с сайта Новости космонавтики '''
+    """ Получает все новости с сайта Новости космонавтики
+    (ну не со всех, со всех долго очень, с 5-ти последних)"""
 
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
     req_space_news = requests.get(url_space_news, headers).text
@@ -161,12 +161,12 @@ def weather(name):
 
 
 def fin_advice():
-    ''' Выводит рандомный совет по фининсам из файла fin_advice.cvs '''
+    """ Выводит рандомный совет по фининсам из файла fin_advice.cvs """
     df = pd.read_csv('fin_advice.cvs', sep=';')
     r = random.randint(0, len(df) - 1)
     adv = str(df['advice'][r])
     descr = str(df['descr'][r])
-    return (adv,descr)
+    return (adv, descr)
 
 
 def search_loc(loc_name):
