@@ -64,7 +64,7 @@ def space_news2(key_word):
     сайта "Новости космонавтики", раздел "Новости" '''
 
     url_space_news = 'https://novosti-kosmonavtiki.ru/news/'
-    news = ''
+    news = []
 
     for page in range(1, 6):
         url = url_space_news + f'page/{page}'
@@ -79,7 +79,7 @@ def space_news2(key_word):
                 art_date = art.find('span', class_="entry-date").get_text()
                 art_link = art.find('a', class_="read-more").get("href")
                 # print(f'{art_date} / {art_title} \n{art_link}') # check
-                news += f'{art_date} / {art_title} \n{art_link}\n'
+                news.append(f'{art_date} / {art_title} \n{art_link}\n')
 
     return news
 
@@ -91,9 +91,9 @@ def space_news_all():
     req_space_news = requests.get(url_space_news, headers).text
     soup = BeautifulSoup(req_space_news, 'html.parser')
     page_numbers = soup.findAll('a', class_='page-numbers')
-    last_page = page_numbers[-2].get_text()
+    last_page = 5 # int(page_numbers[-2].get_text())
     # news = ''
-    news = []
+    all_news = []
     for page in range(1, last_page + 1):
         url = url_space_news + f'page/{page}'
         # print(url) # check
@@ -105,8 +105,8 @@ def space_news_all():
             art_date = art.find('span', class_="entry-date").get_text()
             art_link = art.find('a', class_="read-more").get("href")
             # news += f'{art_date} / {art_title} \n{art_link}\n'
-            news.append(f'{art_date} / {art_title} \n{art_link}\n')
-    return news
+            all_news.append(f'{art_date} / *{art_title}* \n{art_link}\n\n')
+    return all_news
 
 
 def in_orbit():

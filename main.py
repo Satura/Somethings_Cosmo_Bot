@@ -11,10 +11,13 @@ import json
 bot = telebot.TeleBot(telegram_token)
 amount = 0
 c = CurrencyConverter()
-all_news = ''
+# all_news = ''
 locations = []
-lat = 0
-lon = 0
+# lat = 0
+# lon = 0
+news_index = 0
+keyword_news_index = 0
+all_kw_news = []
 
 
 @bot.message_handler(commands=['start'])
@@ -57,19 +60,37 @@ _Тинькофф Журнал_ — издание про деньги и жиз
 _InvestFuture_. Digital-media об инвестициях и личных финансах
 _SMART-LAB_. Мы делаем деньги на бирже''', reply_markup=markup, parse_mode="Markdown")
 
+
+# @bot.message_handler(commands=['space_news'])
+# def space_news(message):
+#     """ Отображение последних 25 статей с сайта "Новости космонавтики" """
+#     output = ''
+#     last_news_page = func.space_news()
+#     for i in range(25):
+#         output += last_news_page[i]
+#     bot.send_message(message.chat.id, output)
+
+
 @bot.message_handler(commands=['space_news'])
 def space_news(message):
-    ''' Отображение последних 25 статей с сайта "Новости космонавтики" '''
+    """ Отображение последних 5 статей с сайта "Новости космонавтики" выбор дальнейшего шага"""
+    global news_index
     output = ''
-    last_news_page = func.space_news()
-    for i in range(25):
-        output += last_news_page[i]
-    bot.send_message(message.chat.id, output)
+    markup = types.InlineKeyboardMarkup()
+    more_btn = types.InlineKeyboardButton('More news', callback_data='more_news')
+    exit_btn = types.InlineKeyboardButton('Stop news', callback_data='exit_news')
+    markup.add(more_btn, exit_btn)
+
+    all_news = func.space_news_all()
+    for i in range(news_index, news_index + 6):
+        output += all_news[i]
+    bot.send_message(message.chat.id, output, reply_markup=markup, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['space_news_keyword'])
 def space_news_keyword(message):
-    ''' Задание ключевого слова для поиска новостей '''
+    """ Задание ключевого слова для поиска новостей """
+    global keyword_news_index
     bot.send_message(message.chat.id, 'О чем желаете найти новости?')
     bot.register_next_step_handler(message, search_in_news)
 
@@ -82,7 +103,7 @@ def weather(message):
 
 @bot.message_handler()
 def navigate(message):
-    ''' Сводка и навгация по "разделам" деньги/космос '''
+    """ Сводка и навгация по "разделам" деньги/космос """
     markup = types.InlineKeyboardMarkup()
     some_btn1 = types.InlineKeyboardButton('Конвертер валют', callback_data='converter')
     some_btn2 = types.InlineKeyboardButton('Фин. мудрость', callback_data='fin_wisdom')
@@ -131,16 +152,52 @@ def callback_message(callback):
     if callback.data == 'space_news_keyword':
         space_news_keyword(callback.message)
 
+    global news_index, keyword_news_index
+
+    if callback.data == 'more_news':
+        news_index += 5
+        space_news(callback.message)
+
+    if callback.data == 'exit_news':
+        news_index = 0
+        bot.send_message(callback.message.chat.id, 'ok')
+
+    if callback.data == 'more_kw_news':
+        keyword_news_index += 3
+        search_in_news(callback.message)
+
+    if callback.data == 'exit_kw_news':
+        keyword_news_index = 0
+        bot.send_message(callback.message.chat.id, 'ok')
+
 
 def search_in_news(message):
-    ''' Ищет и отображает новости по заданному слову '''
+    """ Ищет и отображает новости по заданному слову """
     keyword = message.text.strip()
-    output = func.space_news2(keyword)
-    bot.send_message(message.chat.id, output)
+    # output = func.space_news2(keyword)
+    # bot.send_message(message.chat.id, output)
+    global all_kw_news
+    all_kw_news = func.space_news2(keyword)
+    bot.register_next_step_handler(message, print_3_kw_news)
+
+
+def print_3_kw_news(message):
+    global all_kw_news, keyword_news_index
+    output = ''
+    markup = types.InlineKeyboardMarkup()
+    more_btn = types.InlineKeyboardButton('More', callback_data='more_kw_news')
+    exit_btn = types.InlineKeyboardButton('Stop', callback_data='exit_kw_news')
+    markup.add(more_btn, exit_btn)
+
+    for i in range(keyword_news_index, keyword_news_index + 3):
+        print(f'i = {i}, keyword id = {keyword_news_index + i}, len all_kw_news = {len(all_kw_news)}')
+        output += all_kw_news[i]
+    # print(len(all_kw_news), keyword_news_index, keyword_news_index + 3)
+    bot.send_message(message.chat.id, output, reply_markup=markup, parse_mode='Markdown')
 
 
 def go_convert(message):
-    ''' Получает от пользователя сумму, которую требуется конвертировать '''
+    """ Получает от пользователя сумму, которую требуется конвертировать """
     global amount
     try:
         amount = int(message.text.strip())
@@ -157,7 +214,7 @@ def go_convert(message):
 
 
 def take_currency(message):
-    ''' Разбирает какую пару валют пользователь запрашивает '''
+    """ Разбирает какую пару валют пользователь запрашивает """
     currencies = message.text.upper().split('/')
     try:
         result = round(c.convert(amount, currencies[0], currencies[1]), 2)
@@ -168,10 +225,10 @@ def take_currency(message):
 
 
 def get_weather(message):
-    ''' Получает координаты и погоду (если найден только один пункт с таким названием) '''
+    """ Получает координаты и погоду (если найден только один пункт с таким названием) """
 
     name = message.text
-    global locations, lon, lat
+    global locations  # , lon, lat
     locations = func.search_loc(name)
 
     if len(locations) == 1:
@@ -189,17 +246,20 @@ def get_weather(message):
 
 
 def choose_location(message):
-    ''' Принимает номер выбранной локации и выводит погоду '''
-    global locations, lon, lat
+    """ Принимает номер выбранной локации и выводит погоду """
+    global locations  # , lon, lat
     num = int(message.text)
     lon, lat = locations[num]['GeoObject']['Point']['pos'].split()
     bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
 
 
-if __name__ == '__main__':
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except Exception as e:
-            time.sleep(3)
-            print(f'There is an error: {e}')
+# if __name__ == '__main__':
+#     while True:
+#         try:
+#             bot.polling(none_stop=True)
+#         except Exception as e:
+#             time.sleep(3)
+#             print(f'There is an error: {e}')
+
+
+bot.polling(none_stop=True)
