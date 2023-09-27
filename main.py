@@ -74,8 +74,8 @@ def space_news(message):
     global news_index
     output = ''
     markup = types.InlineKeyboardMarkup()
-    more_btn = types.InlineKeyboardButton('More news', callback_data='more_news')
-    exit_btn = types.InlineKeyboardButton('Stop news', callback_data='exit_news')
+    more_btn = types.InlineKeyboardButton('Больше', callback_data='more_news')
+    exit_btn = types.InlineKeyboardButton('Хватит', callback_data='exit_news')
     markup.add(more_btn, exit_btn)
 
     all_news = func.space_news_all()
@@ -83,7 +83,7 @@ def space_news(message):
         try:
             output += all_news[i]
         except IndexError:
-            output += 'Дальше не совсем уже не новости'
+            output += 'Дальше совсем уже не новости'
             break
     bot.send_message(message.chat.id, output, reply_markup=markup, parse_mode='Markdown')
 
