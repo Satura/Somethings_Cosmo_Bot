@@ -166,7 +166,7 @@ def fin_advice():
     r = random.randint(0, len(df) - 1)
     adv = str(df['advice'][r])
     descr = str(df['descr'][r])
-    return f'{adv}\n{descr}'
+    return (adv,descr)
 
 
 def search_loc(loc_name):
@@ -186,10 +186,10 @@ def get_weather_coord(lon, lat):
     url_yaweather = f'https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}&lang=u_RU&extra=true'
     yandex_req = requests.get(url_yaweather, headers={'X-Yandex-API-Key': yandex_weather_token})
     yandex_json = json.loads(yandex_req.text)
-    forcasts = yandex_json['forecasts']
+    forecasts = yandex_json['forecasts']
 
     output = ''
-    for day in forcasts:
+    for day in forecasts:
         date = day['date']
         part_day = day['parts']['day']
         day_temp = part_day['temp_avg']

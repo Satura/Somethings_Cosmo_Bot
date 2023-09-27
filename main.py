@@ -38,20 +38,24 @@ def converter(message):
     bot.register_next_step_handler(message, go_convert)
 
 
-@bot.message_handler(commands=['site_fin_cult'])
-def site_fin_cult(message):
+@bot.message_handler(commands=['fin_wisdom'])
+def fin_wisdom(message):
     ''' Сводка с полезностями '''
     advice = func.fin_advice()
-    info = f'''Совет дня: {advice}\n
-а так же
-    * много разного полезного от ЦБ РФ: Финансовая культура  https://fincult.info
-    * о самом разном: Тинькофф-Журнал https://journal.tinkoff.ru
-    * об инвестициях: InvestFuture https://investfuture.ru'''
-
-    bot.send_message(message.chat.id, info)
-    # webbrowser.open('https://fincult.info') # это работало,
-    # отказалась от идеи каждый раз принудительно "пользвателю" открывать страницу
-
+    adv = str(advice[0])
+    descr = str(advice[1])
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    url_btn1 = types.InlineKeyboardButton('FincultInfo', url='https://fincult.info')
+    url_btn2 = types.InlineKeyboardButton('Тинькофф-Журнал', url='https://journal.tinkoff.ru')
+    url_btn3 = types.InlineKeyboardButton('InvestFuture', url='https://investfuture.ru')
+    url_btn4 = types.InlineKeyboardButton('SMART-LAB', url='https://smart-lab.ru')
+    markup.add(url_btn1, url_btn2, url_btn3, url_btn4)
+    bot.send_message(message.chat.id, f'''💸 *{adv}*\n{descr}
+\n👛*Полезные ресурсы:* 
+_FincultInfo_ — информационно-просветительский ресурс, созданный ЦБ РФ. Его цель — формирование финансовой культуры граждан.
+_Тинькофф Журнал_ — издание про деньги и жизнь
+_InvestFuture_. Digital-media об инвестициях и личных финансах
+_SMART-LAB_. Мы делаем деньги на бирже''', reply_markup=markup, parse_mode="Markdown")
 
 @bot.message_handler(commands=['space_news'])
 def space_news(message):
@@ -81,7 +85,7 @@ def navigate(message):
     ''' Сводка и навгация по "разделам" деньги/космос '''
     markup = types.InlineKeyboardMarkup()
     some_btn1 = types.InlineKeyboardButton('Конвертер валют', callback_data='converter')
-    some_btn2 = types.InlineKeyboardButton('Полезность', callback_data='site_fin_cult')
+    some_btn2 = types.InlineKeyboardButton('Фин. мудрость', callback_data='fin_wisdom')
     some_btn3 = types.InlineKeyboardButton('Прогноз погоды', callback_data='weather')
     cosmo_btn1 = types.InlineKeyboardButton('Сейчас на орбите', callback_data='orbit')
     cosmo_btn2 = types.InlineKeyboardButton('Новости космонавтики', callback_data='space_news')
@@ -92,7 +96,7 @@ def navigate(message):
         brief = func.fin_info()
         markup.add(some_btn1, some_btn2)
         markup.add(some_btn3)
-        bot.send_message(message.chat.id, brief, parse_mode='HTML', reply_markup=markup)
+        bot.send_message(message.chat.id, brief, reply_markup=markup)
 
     if message.text == 'Космо':
         # Сводка по космонавтике, дальнейшая навигация
@@ -109,8 +113,8 @@ def navigate(message):
 @bot.callback_query_handler(func=lambda callback: True)
 def callback_message(callback):
     # навигация по Inline-кнопкам
-    if callback.data == 'site_fin_cult':
-        site_fin_cult(callback.message)
+    if callback.data == 'fin_wisdom':
+        fin_wisdom(callback.message)
 
     if callback.data == 'converter':
         converter(callback.message)
