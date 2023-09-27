@@ -4,9 +4,7 @@ import telebot
 import func
 from telebot import types
 from constant import telegram_token
-import webbrowser
 from currency_converter import CurrencyConverter
-import json
 
 bot = telebot.TeleBot(telegram_token)
 amount = 0
@@ -56,16 +54,6 @@ _FincultInfo_ — информационно-просветительский р
 _Тинькофф Журнал_ — издание про деньги и жизнь
 _InvestFuture_. Digital-media об инвестициях и личных финансах
 _SMART-LAB_. Мы делаем деньги на бирже''', reply_markup=markup, parse_mode="Markdown")
-
-
-# @bot.message_handler(commands=['space_news'])
-# def space_news(message):
-#     """ Отображение последних 25 статей с сайта "Новости космонавтики" """
-#     output = ''
-#     last_news_page = func.space_news()
-#     for i in range(25):
-#         output += last_news_page[i]
-#     bot.send_message(message.chat.id, output)
 
 
 @bot.message_handler(commands=['space_news'])
@@ -179,7 +167,8 @@ def search_in_news(message):
     if len(all_kw_news) == 0:
         bot.send_message(message.chat.id, 'Нет новостей об этом')
     else:
-        bot.register_next_step_handler(message, print_3_kw_news)
+        # bot.register_next_step_handler(message, print_3_kw_news)
+        print_3_kw_news(message)
 
 
 def print_3_kw_news(message):
@@ -257,13 +246,13 @@ def choose_location(message):
     bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
 
 
-# if __name__ == '__main__':
-#     while True:
-#         try:
-#             bot.polling(none_stop=True)
-#         except Exception as e:
-#             time.sleep(3)
-#             print(f'There is an error: {e}')
+if __name__ == '__main__':
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception as e:
+            time.sleep(3)
+            print(f'There is an error: {e}')
 
 
-bot.polling(none_stop=True)
+# bot.polling(none_stop=True)
