@@ -1,6 +1,7 @@
 # Somethings&CosmoBot
 
 Бот для отображения различной информации о финансах и космонавтике, конвертации валют и прогноза погоды.
+[@somethings_cosmo_bot](https://t.me/somethings_cosmo_bot) 
 
 ### Бот умеет:
 
@@ -46,7 +47,7 @@
 </details>
 
 <details>
-  <summary>"Полезность"</summary>
+  <summary>Фин. мудрость</summary>
 
 ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/04_%D0%BF%D0%BE%D0%BB%D0%B5%D0%B7%D0%BD%D0%BE%D1%81%D1%82%D1%8C.png)
 
@@ -67,7 +68,7 @@
 </details>
 
 <details>
-  <summary>Все последние новости с сайта</summary>
+  <summary>Последние новости с сайта</summary>
 
 ![](https://github.com/Satura/Finance_Space_Bot/blob/main/screenshots/07_%D0%B2%D1%81%D0%B5%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.png)
 

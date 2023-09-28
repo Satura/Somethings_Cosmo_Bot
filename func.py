@@ -22,15 +22,11 @@ def fin_info():
     sp_cbr = BeautifulSoup(req_cbr, 'html.parser')
     indicators = sp_cbr.findAll('div', class_="main-indicator")
     rate = indicators[2].find('div', class_="main-indicator_value").get_text()
-    # print(f'Текущая ключевая ставка: {rate}')
 
     exchange_rates = sp_cbr.findAll('div', class_="main-indicator_rate")
     exchange_rates_m1 = exchange_rates[0].findAll('div')
-    # print(f'{exchange_rates_m1[0].get_text(strip=True)}: {exchange_rates_m1[1].get_text(strip=True)}')
     exchange_rates_m2 = exchange_rates[1].findAll('div')
-    # print(f'{exchange_rates_m2[0].get_text(strip=True)}: {exchange_rates_m2[1].get_text(strip=True)}')
     exchange_rates_m3 = exchange_rates[2].findAll('div')
-    # print(f'{exchange_rates_m3[0].get_text(strip=True)}: {exchange_rates_m3[1].get_text(strip=True)}')
 
     return f"""Текущая ключевая ставка: {rate}
 Курс основных валют: 
@@ -67,17 +63,14 @@ def space_news2(key_word):
 
     for page in range(1, 6):
         url = url_space_news + f'page/{page}'
-        # print(url) # check
         req = requests.get(url).text
         sp = BeautifulSoup(req, 'html.parser')
         articles = sp.findAll('article')
         for art in articles:
             art_title = art.find('h2', class_="post-title").get_text()
-            # print(art_title) # check
             if key_word.lower() in art_title.lower():
                 art_date = art.find('span', class_="entry-date").get_text()
                 art_link = art.find('a', class_="read-more").get("href")
-                # print(f'{art_date} / {art_title} \n{art_link}') # check
                 news.append(f'{art_date} / {art_title} \n{art_link}\n')
 
     return news
@@ -91,21 +84,21 @@ def space_news_all():
     req_space_news = requests.get(url_space_news, headers).text
     soup = BeautifulSoup(req_space_news, 'html.parser')
     page_numbers = soup.findAll('a', class_='page-numbers')
-    last_page = 5 # int(page_numbers[-2].get_text())
-    # news = ''
+    last_page = 5  # int(page_numbers[-2].get_text())
     all_news = []
+
     for page in range(1, last_page + 1):
         url = url_space_news + f'page/{page}'
-        # print(url) # check
         req = requests.get(url).text
         sp = BeautifulSoup(req, 'html.parser')
         articles = sp.findAll('article')
+
         for art in articles:
             art_title = art.find('h2', class_="post-title").get_text()
             art_date = art.find('span', class_="entry-date").get_text()
             art_link = art.find('a', class_="read-more").get("href")
-            # news += f'{art_date} / {art_title} \n{art_link}\n'
             all_news.append(f'{art_date} / *{art_title}* \n{art_link}\n\n')
+
     return all_news
 
 
@@ -116,9 +109,9 @@ def in_orbit():
     req = requests.get(url, headers).text
     sp = BeautifulSoup(req, 'html.parser')
     cosmonauts = sp.findAll('h2', class_='post-title')
-    output = f'На орбите сегодя {len(cosmonauts)} человек:\n'
+    output = f'*На орбите сегодя {len(cosmonauts)} человек:\n*'
     for c in cosmonauts:
-        output += c.get_text() + "\n"
+        output += "- " + c.get_text() + "\n"
     return output
 
 
@@ -140,19 +133,18 @@ def weather(name):
     if name == "Байконур":
         lat = 46.060493
         lon = 63.318439
-    if name == "Плесецк":
-        lat = 62.956901
-        lon = 40.459387
+
     url_yaweather = f'https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}&lang=u_RU&extra=true'
     yandex_req = requests.get(url_yaweather, headers={'X-Yandex-API-Key': yandex_weather_token})
 
-    conditions = {'clear': 'ясно', 'partly-cloudy': 'малооблачно', 'cloudy': 'облачно с прояснениями',
-                  'overcast': 'пасмурно', 'drizzle': 'морось', 'light-rain': 'небольшой дождь',
-                  'rain': 'дождь', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
+    conditions = {'clear': 'ясно \U00002600', 'partly-cloudy': 'малооблачно',
+                  'cloudy': 'облачно с прояснениями \U00002601',
+                  'overcast': 'пасмурно', 'drizzle': 'морось \U00002614', 'light-rain': 'небольшой дождь',
+                  'rain': 'дождь \U00002614', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
                   'continuous-heavy-rain': 'длительный сильный дождь', 'showers': 'ливень',
-                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег',
-                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза',
-                  'thunderstorm-with-rain': 'дождь с грозой', 'thunderstorm-with-hail': 'гроза с градом'
+                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег \U0001F328',
+                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза \U000026A1',
+                  'thunderstorm-with-rain': 'дождь с грозой \U000026C8', 'thunderstorm-with-hail': 'гроза с градом'
                   }
 
     yandex_json = json.loads(yandex_req.text)
@@ -170,23 +162,37 @@ def fin_advice():
 
 
 def search_loc(loc_name):
+    """ Находит по названию населенного пункта его координаты """
     query = f'https://geocode-maps.yandex.ru/1.x?apikey={yandex_maps_token}&geocode={loc_name}&lang=ru_Ru&format=json'
     yandex_resp = requests.get(query)
     yandex_json = json.loads(yandex_resp.text)
     list_geoobjects = yandex_json['response']['GeoObjectCollection']['featureMember']
     locations = []
+
     for i in list_geoobjects:
         if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality' or \
                 i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'province':
             locations.append(i)
+
     return locations
 
 
 def get_weather_coord(lon, lat):
+    """ Получает погоду с Яндекса по переданным координатам """
     url_yaweather = f'https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}&lang=u_RU&extra=true'
     yandex_req = requests.get(url_yaweather, headers={'X-Yandex-API-Key': yandex_weather_token})
     yandex_json = json.loads(yandex_req.text)
     forecasts = yandex_json['forecasts']
+
+    conditions = {'clear': 'ясно \U00002600', 'partly-cloudy': 'малооблачно',
+                  'cloudy': 'облачно с прояснениями \U00002601',
+                  'overcast': 'пасмурно', 'drizzle': 'морось \U00002614', 'light-rain': 'небольшой дождь',
+                  'rain': 'дождь \U00002614', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
+                  'continuous-heavy-rain': 'длительный сильный дождь', 'showers': 'ливень',
+                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег \U0001F328',
+                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза \U000026A1',
+                  'thunderstorm-with-rain': 'дождь с грозой \U000026C8', 'thunderstorm-with-hail': 'гроза с градом'
+                  }
 
     output = ''
     for day in forecasts:
@@ -194,10 +200,15 @@ def get_weather_coord(lon, lat):
         part_day = day['parts']['day']
         day_temp = part_day['temp_avg']
         day_wind = part_day['wind_speed']
-        day_cond = part_day['condition']
+        day_cond = conditions[part_day['condition']]
         part_night = day['parts']['night']
         night_temp = part_night['temp_avg']
         night_wind = part_night['wind_speed']
-        night_cond = part_night['condition']
-        output += f'\nНа {date} (день/ночь): температура {day_temp}/{night_temp} скорость ветра {day_wind}/{night_wind} условия {day_cond}/{night_cond}\n'
+        night_cond = conditions[part_night['condition']]
+
+        output += (f'\n*На {date} (день / ночь):* \n'
+                   f'Температура: {day_temp} / {night_temp} °C\n'
+                   f'Скорость ветра: {day_wind} / {night_wind} м/с \n'
+                   f'Условия: {day_cond} / {night_cond}\n')
+
     return output

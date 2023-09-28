@@ -132,7 +132,7 @@ def callback_message(callback):
         weather(callback.message)
 
     if callback.data == 'orbit':
-        bot.send_message(callback.message.chat.id, func.in_orbit())
+        bot.send_message(callback.message.chat.id, func.in_orbit(), parse_mode='Markdown')
 
     if callback.data == 'space_news':
         space_news(callback.message)
@@ -167,7 +167,6 @@ def search_in_news(message):
     if len(all_kw_news) == 0:
         bot.send_message(message.chat.id, 'Нет новостей об этом')
     else:
-        # bot.register_next_step_handler(message, print_3_kw_news)
         print_3_kw_news(message)
 
 
@@ -226,7 +225,7 @@ def get_weather(message):
 
     if len(locations) == 1:
         lon, lat = locations[0]['GeoObject']['Point']['pos'].split()
-        bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
+        bot.send_message(message.chat.id, func.get_weather_coord(lon, lat), parse_mode='Markdown')
     #
     if len(locations) > 1:
         all_locs = ''
