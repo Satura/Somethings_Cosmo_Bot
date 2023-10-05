@@ -11,7 +11,8 @@ locations = []
 news_index = 0
 keyword_news_index = 0
 all_kw_news = []
-
+base_cur = ''
+cur_list = []
 
 @bot.message_handler(commands=['start'])
 def main(message):
@@ -57,6 +58,7 @@ _SMART-LAB_. Мы делаем деньги на бирже''', reply_markup=mar
 @bot.message_handler(commands=['space_news'])
 def space_news(message):
     """ Отображение последних 5 статей с сайта "Новости космонавтики" выбор дальнейшего шага"""
+    # TODO: сброс индекса "порции" новостей через какое-то время, если пользователь забыл или проигнорировал кнопку "Хватит"
     global news_index
     output = ''
     markup = types.InlineKeyboardMarkup()
@@ -170,6 +172,7 @@ def search_in_news(message):
 
 def print_3_kw_news(message):
     global all_kw_news, keyword_news_index
+    # TODO: сброс индекса "порции" новостей через какое-то время, если пользователь забыл или проигнорировал кнопку "Хватит"
     output = ''
     markup = types.InlineKeyboardMarkup()
     more_btn = types.InlineKeyboardButton('Больше', callback_data='more_kw_news')
@@ -196,7 +199,7 @@ def go_convert(message):
         bot.register_next_step_handler(message, go_convert)
 
     if amount > 0:
-        bot.send_message(message.chat.id, 'Введите сообщение в виде: "<базовая валюта> <валюта1>, <валюта2>, ...<валютаN>"')
+        bot.send_message(message.chat.id, 'Введите сообщение в виде: "<базовая валюта> <валюта1>,<валюта2>,...<валютаN>"')
         bot.register_next_step_handler(message, take_currency)
     else:
         bot.send_message(message.chat.id, 'Введите положительное число')
@@ -205,9 +208,17 @@ def go_convert(message):
 
 def take_currency(message):
     """ Разбирает какие пары валют пользователь запрашивает """
-    currencies = message.text.upper().split()
-    base_cur = currencies[0]
-    cur_list = currencies[1].split(',')
+    global base_cur, cur_list
+
+    currencies = message.text.upper().split(" ", 1)
+    if len(currencies) >= 2:
+        base_cur = currencies[0]
+        cur_list = currencies[1].replace(" ", "").split(',')
+
+    else:
+        bot.send_message(message.chat.id, f'Забыли целевую валюту. Введите  запрос заного (базовая-пробел-целевые(через запятую)))')
+        bot.register_next_step_handler(message, take_currency)
+        return
     try:
         result = func.new_converter(amount, base_cur, cur_list)
         bot.send_message(message.chat.id, result, parse_mode='Markdown')
