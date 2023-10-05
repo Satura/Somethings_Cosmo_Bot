@@ -4,11 +4,9 @@ import telebot
 import func
 from telebot import types
 from constant import telegram_token
-from currency_converter import CurrencyConverter
 
 bot = telebot.TeleBot(telegram_token)
 amount = 0
-c = CurrencyConverter()
 locations = []
 news_index = 0
 keyword_news_index = 0
@@ -198,7 +196,7 @@ def go_convert(message):
         bot.register_next_step_handler(message, go_convert)
 
     if amount > 0:
-        bot.send_message(message.chat.id, 'Введите валюты через слэш (пр.: "cny/usd")')
+        bot.send_message(message.chat.id, 'Введите сообщение в виде: "<базовая валюта> <валюта1>, <валюта2>, ...<валютаN>"')
         bot.register_next_step_handler(message, take_currency)
     else:
         bot.send_message(message.chat.id, 'Введите положительное число')
@@ -206,11 +204,13 @@ def go_convert(message):
 
 
 def take_currency(message):
-    """ Разбирает какую пару валют пользователь запрашивает """
-    currencies = message.text.upper().split('/')
+    """ Разбирает какие пары валют пользователь запрашивает """
+    currencies = message.text.upper().split()
+    base_cur = currencies[0]
+    cur_list = currencies[1].split(',')
     try:
-        result = round(c.convert(amount, currencies[0], currencies[1]), 2)
-        bot.send_message(message.chat.id, result)
+        result = func.new_converter(amount, base_cur, cur_list)
+        bot.send_message(message.chat.id, result, parse_mode='Markdown')
     except Exception as e:
         bot.send_message(message.chat.id, f'Что-то пошло не так:\n{e}\nВведите другую пару валют')
         bot.register_next_step_handler(message, take_currency)
@@ -242,7 +242,7 @@ def choose_location(message):
     global locations  # , lon, lat
     num = int(message.text)
     lon, lat = locations[num]['GeoObject']['Point']['pos'].split()
-    bot.send_message(message.chat.id, func.get_weather_coord(lon, lat))
+    bot.send_message(message.chat.id, func.get_weather_coord(lon, lat), parse_mode='Markdown')
 
 
 if __name__ == '__main__':
@@ -251,7 +251,7 @@ if __name__ == '__main__':
             bot.polling(none_stop=True)
         except Exception as e:
             time.sleep(3)
-            print(f'There is an error: {e}')
+            print(f'There is an error: {e} at {time.time()}')
 
 
 # bot.polling(none_stop=True)

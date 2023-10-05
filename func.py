@@ -1,3 +1,5 @@
+from datetime import date
+
 import requests
 from bs4 import BeautifulSoup
 from constant import yandex_weather_token
@@ -5,6 +7,8 @@ from constant import yandex_maps_token
 import json
 import pandas as pd
 import random
+
+from py_currency_converter import convert
 
 headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -137,14 +141,14 @@ def weather(name):
     url_yaweather = f'https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}&lang=u_RU&extra=true'
     yandex_req = requests.get(url_yaweather, headers={'X-Yandex-API-Key': yandex_weather_token})
 
-    conditions = {'clear': 'ясно \U00002600', 'partly-cloudy': 'малооблачно',
-                  'cloudy': 'облачно с прояснениями \U00002601',
-                  'overcast': 'пасмурно', 'drizzle': 'морось \U00002614', 'light-rain': 'небольшой дождь',
-                  'rain': 'дождь \U00002614', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
+    conditions = {'clear': 'ясно', 'partly-cloudy': 'малооблачно',
+                  'cloudy': 'облачно с прояснениями',
+                  'overcast': 'пасмурно', 'drizzle': 'морось', 'light-rain': 'небольшой дождь',
+                  'rain': 'дождь', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
                   'continuous-heavy-rain': 'длительный сильный дождь', 'showers': 'ливень',
-                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег \U0001F328',
-                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза \U000026A1',
-                  'thunderstorm-with-rain': 'дождь с грозой \U000026C8', 'thunderstorm-with-hail': 'гроза с градом'
+                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег',
+                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза',
+                  'thunderstorm-with-rain': 'дождь с грозой', 'thunderstorm-with-hail': 'гроза с градом'
                   }
 
     yandex_json = json.loads(yandex_req.text)
@@ -184,14 +188,14 @@ def get_weather_coord(lon, lat):
     yandex_json = json.loads(yandex_req.text)
     forecasts = yandex_json['forecasts']
 
-    conditions = {'clear': 'ясно \U00002600', 'partly-cloudy': 'малооблачно',
-                  'cloudy': 'облачно с прояснениями \U00002601',
-                  'overcast': 'пасмурно', 'drizzle': 'морось \U00002614', 'light-rain': 'небольшой дождь',
-                  'rain': 'дождь \U00002614', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
+    conditions = {'clear': 'ясно', 'partly-cloudy': 'малооблачно',
+                  'cloudy': 'облачно с прояснениями',
+                  'overcast': 'пасмурно', 'drizzle': 'морось', 'light-rain': 'небольшой дождь',
+                  'rain': 'дождь', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
                   'continuous-heavy-rain': 'длительный сильный дождь', 'showers': 'ливень',
-                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег \U0001F328',
-                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза \U000026A1',
-                  'thunderstorm-with-rain': 'дождь с грозой \U000026C8', 'thunderstorm-with-hail': 'гроза с градом'
+                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег',
+                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза',
+                  'thunderstorm-with-rain': 'дождь с грозой', 'thunderstorm-with-hail': 'гроза с градом'
                   }
 
     output = ''
@@ -212,3 +216,12 @@ def get_weather_coord(lon, lat):
                    f'Условия: {day_cond} / {night_cond}\n')
 
     return output
+
+
+def new_converter(amount, cur_from, cur_to):
+    result = convert(cur_from, date.today(), amount, cur_to)
+    output = ''
+    for cur_name in result:
+        output += f'*{cur_name}*: {round(result[cur_name],2)}\n'
+    return output
+

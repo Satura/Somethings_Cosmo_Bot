@@ -15,7 +15,7 @@
 ### Использует дополнительные библиотеки:
 
 - telebot
-- CurrencyConverter
+- Python Currency Converter (py_currency_converter)
 - requests
 - BeautifulSoup
 - pandas
