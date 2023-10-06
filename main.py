@@ -58,7 +58,7 @@ _SMART-LAB_. Мы делаем деньги на бирже''', reply_markup=mar
 @bot.message_handler(commands=['space_news'])
 def space_news(message):
     """ Отображение последних 5 статей с сайта "Новости космонавтики" выбор дальнейшего шага"""
-    # TODO: сброс индекса "порции" новостей через какое-то время, если пользователь забыл или проигнорировал кнопку "Хватит"
+
     global news_index
     output = ''
     markup = types.InlineKeyboardMarkup()
@@ -172,7 +172,7 @@ def search_in_news(message):
 
 def print_3_kw_news(message):
     global all_kw_news, keyword_news_index
-    # TODO: сброс индекса "порции" новостей через какое-то время, если пользователь забыл или проигнорировал кнопку "Хватит"
+
     output = ''
     markup = types.InlineKeyboardMarkup()
     more_btn = types.InlineKeyboardButton('Больше', callback_data='more_kw_news')
