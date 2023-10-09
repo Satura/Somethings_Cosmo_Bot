@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 import telebot
 import func
@@ -231,13 +232,13 @@ def get_weather(message):
     """ Получает координаты и погоду (если найден только один пункт с таким названием) """
 
     name = message.text
-    global locations  # , lon, lat
+    global locations
     locations = func.search_loc(name)
 
     if len(locations) == 1:
         lon, lat = locations[0]['GeoObject']['Point']['pos'].split()
         bot.send_message(message.chat.id, func.get_weather_coord(lon, lat), parse_mode='Markdown')
-    #
+
     if len(locations) > 1:
         all_locs = ''
         for l in range(len(locations)):
@@ -262,7 +263,7 @@ if __name__ == '__main__':
             bot.polling(none_stop=True)
         except Exception as e:
             time.sleep(3)
-            print(f'There is an error: {e} at {time.time()}')
+            print(f'There is an error: {e} at {datetime.now()}')
 
 
 # bot.polling(none_stop=True)
