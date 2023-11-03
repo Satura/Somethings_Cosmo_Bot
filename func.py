@@ -157,8 +157,8 @@ def weather(name):
 
 
 def fin_advice():
-    """ Выводит рандомный совет по фининсам из файла fin_advice.cvs """
-    df = pd.read_csv('fin_advice.cvs', sep=';')
+    """ Выводит рандомный совет по фининсам из файла fin_advice.csv """
+    df = pd.read_csv('fin_advice.csv', sep=';')
     r = random.randint(0, len(df) - 1)
     adv = str(df['advice'][r])
     descr = str(df['descr'][r])
